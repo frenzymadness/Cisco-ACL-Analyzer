@@ -1,0 +1,20 @@
+$def with (results)
+<table>
+    <tr>
+        <th>#</th>
+        <th>Rule</th>
+        <th>Reason</th>
+    </tr>
+    $for num, (status, rule, reasons) in enumerate(results):
+        <tr>
+            <td>${num + 1}</td>
+            $if status == True:
+                $if rule.startswith('permit'):
+                    <td><div style="color: green">$rule</div></td>
+                $elif rule.startswith('deny'):
+                    <td><div style="color: red">$rule</div></td>
+            $else:
+                <td>$rule</td>
+            <td>$', '.join(reasons)</td>
+        </tr>
+</table>

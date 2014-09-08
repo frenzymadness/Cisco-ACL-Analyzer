@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Lumír Balhar">
+
+  <title>Cisco ACL checker</title>
+
+</head>
+<body>
+  <table>
+    <tr>
+      <th>Packet source</th>
+      <th>Packet destination</th>
+    </tr>
+    <tr>
+      <td>
+        <form id="mainform" method="POST" action="/result">
+          <select name="protocol">
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+          </select>
+          <input type="text" name="srcIP" value="source IP">:<input type="text" name="srcPort" value="source Port [empty = random port]">
+        </td>
+        <td>
+          <input type="text" name="dstIP" value="destination IP">:<input type="text" name="dstPort" value="destination Port">
+        </td>
+      </tr>
+      <th>
+        Paste ACL rules
+      </th>
+      <th>
+        Results
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <textarea name="acl" cols="50" rows="30"></textarea>
+      </td>
+      <td id="resultcell" style="vertical-align: top;">
+
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="submit" value="Analyze ACL">
+      </td>
+    </tr>
+  </form>
+</table>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript">
+  $$( document ).ready(function() {
+    $$("#mainform").submit(function(e)
+    {
+          e.preventDefault(); //STOP default action
+
+          var postData = $$(this).serializeArray();
+          var formURL = $$(this).attr("action");
+          $$.ajax(
+          {
+            url : formURL,
+            type: "POST",
+            data : postData,
+            success:function(data, textStatus, jqXHR)
+            {
+              $$( '#resultcell' ).html(data);
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+              alert('error has occured')
+            }
+          });
+          return false;
+        });
+  });
+</script>
+</body>
+</html>
