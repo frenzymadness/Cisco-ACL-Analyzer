@@ -163,14 +163,24 @@ class Packet:
         self.protocol = protocol
         self.srcIP = ip_address(unicode(srcIP))
 
-        # src port can be random number
+        # src port can be random number or name
         if srcPort == '':
             self.srcPort = randint(1, 65536)
+        elif not srcPort.isdigit():
+            self.srcPort = portNames['srcPort']
         else:
             self.srcPort = int(srcPort)
 
         self.dstIP = ip_address(unicode(dstIP))
-        self.dstPort = int(dstPort)
+
+        # dst port can be random number or name
+        if dstPort == '':
+            self.dstPort = randint(1, 65536)
+        elif not dstPort.isdigit():
+            self.dstPort = portNames[dstPort]
+        else:
+            self.dstPort = int(dstPort)
+
 
     def __str__(self):
         return '%s - %s:%s --> %s:%s' % (self.protocol, self.srcIP, self.srcPort, self.dstIP, self.dstPort)
