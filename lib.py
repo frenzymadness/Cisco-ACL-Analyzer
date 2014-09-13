@@ -98,15 +98,15 @@ class Rule:
 # Class for representing whole ACL with rules
 class ACL:
     def __init__(self, lines):
+        # Preparing text lines
         self.lines = []
         for line in lines:
             self.lines.append(' '.join(line.split()))
 
-    def get_rules(self):
-        rules = []
+        self.rules = []
 
         # For every line in ACL
-        for line in self.lines:
+        for num, line in enumerate(self.lines):
             # Strip lines
             line = line.strip()
 
@@ -117,14 +117,15 @@ class ACL:
             # If line starts with digit (copied from console), continue without numbers
             if line.split(' ')[0].isdigit():
                 line = line[1:]
+            try:
+                self.rules.append(Rule(line))
+            except Exception as e:
+                raise RuntimeError('Error parsing rule on line %d\nRule: %s\nError message:%s' % (num, line, e))
 
-            rules.append(Rule(line))
-
-        return rules
 
     def check_packet(self, packet):
         result = []
-        for rule in self.get_rules():
+        for rule in self.rules:
             reasons = []
             # Check protocol
             if not (packet.protocol == rule.protocol or rule.protocol == 'ip'):

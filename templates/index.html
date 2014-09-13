@@ -69,7 +69,7 @@
             },
             error: function(jqXHR, textStatus, errorThrown)
             {
-              alert('error has occured')
+              $$( '#resultcell' ).html(jqXHR.responseText)
             }
           });
           return false;
