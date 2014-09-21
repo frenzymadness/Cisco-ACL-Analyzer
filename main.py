@@ -2,9 +2,6 @@ import web
 import os
 from lib import *
 
-# debug mode
-web.config.debug = False
-
 # Root dir and render object with templates
 rootdir = os.path.abspath(os.path.dirname(__file__)) + '/'
 render = web.template.render(rootdir + 'templates/')
