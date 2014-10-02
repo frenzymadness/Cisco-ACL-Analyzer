@@ -123,7 +123,6 @@ class ACL:
             except Exception as e:
                 raise RuntimeError('Error parsing rule on line %d\nRule: %s\nError message:%s' % (num, line, e))
 
-
     def check_packet(self, packet):
         result = []
         for rule in self.rules:
@@ -181,7 +180,6 @@ class Packet:
             self.dstPort = portNames[dstPort]
         else:
             self.dstPort = int(dstPort)
-
 
     def __str__(self):
         return '%s - %s:%s --> %s:%s' % (self.protocol, self.srcIP, self.srcPort, self.dstIP, self.dstPort)
