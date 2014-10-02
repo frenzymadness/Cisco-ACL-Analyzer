@@ -118,6 +118,14 @@ class ACL:
             if line.split(' ')[0].isdigit():
                 line = ' '.join(line.split(' ')[1:]).strip()
 
+            # If line ends with count of matches (also from CLI), remove this information (2 parts)
+            if line.endswith('matches)'):
+                line = ' '.join(line.split(' ')[:-2]).strip()
+
+            # Also remove established tag - we can't handle with it (TODO)
+            if line.endswith('established'):
+                line = ' '.join(line.split(' ')[:-1]).strip()
+
             try:
                 self.rules.append(Rule(line))
             except Exception as e:
