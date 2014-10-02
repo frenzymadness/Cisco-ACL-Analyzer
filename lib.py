@@ -111,7 +111,7 @@ class ACL:
             line = line.strip()
 
             # If line is ACL definition, continue
-            if line.startswith('ip access-list'):
+            if line.startswith('ip access-list') or line.startswith('Extended IP access list'):
                 continue
 
             # If line starts with digit (copied from console), continue without numbers
