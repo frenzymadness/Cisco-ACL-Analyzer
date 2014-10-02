@@ -1,7 +1,7 @@
 import web
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.dirname(__file__))) 
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from lib import *
 
 # Root dir and render object with templates
@@ -35,4 +35,3 @@ class result:
 
 app = web.application(urls, globals(), autoreload=True)
 application = app.wsgifunc()
-
