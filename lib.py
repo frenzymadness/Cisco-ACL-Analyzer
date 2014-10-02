@@ -116,8 +116,8 @@ class ACL:
 
             # If line starts with digit (copied from console), continue without numbers
             if line.split(' ')[0].isdigit():
-                line = line.split(' ')[1:]
-                line = ' '.join(line).strip()
+                line = ' '.join(line.split(' ')[1:]).strip()
+
             try:
                 self.rules.append(Rule(line))
             except Exception as e:
