@@ -57,6 +57,7 @@
     {
           e.preventDefault(); //STOP default action
 
+          // load dynamic content and paste to document
           var postData = $$(this).serializeArray();
           var formURL = $$(this).attr("action");
           $$.ajax(

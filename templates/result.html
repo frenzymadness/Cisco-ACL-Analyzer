@@ -1,4 +1,4 @@
-$def with (results)
+$def with (results, graphname)
 <table class="table table-striped table-hover">
     <tr>
         <th>#</th>
@@ -18,3 +18,5 @@ $def with (results)
             <td>$', '.join(reasons)</td>
         </tr>
 </table>
+<h2>Network vizualization</h2>
+<img id="graph" src="/graphs/$graphname" />

@@ -30,8 +30,7 @@ class result:
         packet = Packet(input['protocol'], input['srcIP'], input['srcPort'], input['dstIP'], input['dstPort'])
         result = acl.check_packet(packet)
         print packet
-        return render.result(result)
-
+        return render.result(result, acl.generate_graph())
 
 app = web.application(urls, globals(), autoreload=True)
 application = app.wsgifunc()
