@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from ipaddress import *
 from random import randint
-
+import pygraphviz as pgv
+from hashlib import md5
+import os
 
 # function to switch mask from 0.0.255.255 to 255.255.0.0
 def switchMask(mask):
@@ -167,14 +169,37 @@ class ACL:
 
         return result
 
-        def generate_graph(self):
-            # make hash from ACL content
-            # check if file with hash in name exists in graphs folder
-                # if yes, return graph name
-            # else
-                # create graph
-                # save it to folder
-                # return filename
+    def generate_graph(self):
+        # make graphname as hash from ACL content
+        graphname = md5(self.txt).hexdigest() + '.png'
+
+        graphfolder = os.path.abspath(os.path.dirname(__file__)) + '/graphs/'
+
+        # if graph for same ACL exists, return its name
+        if os.path.exists(graphfolder + graphname):
+            return graphname
+        else:
+            # create graph
+            graph = pgv.AGraph(strict=False, directed=True)
+            # set default shape to box
+            graph.node_attr['shape'] = 'box'
+
+            # for every rule create a edge between two nodes
+            for rule in self.rules:
+                # Coloring edges based on rule type
+                if rule.type == 'permit':
+                    color = 'green'
+                else:
+                    color = 'red'
+                # Add edge to graph
+                graph.add_edge(rule.srcIP, rule.dstIP,width='4.0', len='3.0', color=color, label='%s --> %s' % (rule.srcPort, rule.dstPort))
+
+            # initialize layout
+            graph.layout()
+            # write graph to image
+            graph.draw(graphfolder + graphname)
+            # return graph name
+            return graphname
 
 
 # Class representing one packet
