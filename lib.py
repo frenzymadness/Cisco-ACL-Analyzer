@@ -164,6 +164,15 @@ class ACL:
 
         return result
 
+        def generate_graph(self):
+            # make hash from ACL content
+            # check if file with hash in name exists in graphs folder
+                # if yes, return graph name
+            # else
+                # create graph
+                # save it to folder
+                # return filename
+
 
 # Class representing one packet
 class Packet:
