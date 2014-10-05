@@ -24,7 +24,7 @@ class result:
     def POST(self):
         input = web.input()
         try:
-            acl = ACL(input['acl'].split('\n'))
+            acl = ACL(input['acl'])
         except Exception as e:
             return e
         packet = Packet(input['protocol'], input['srcIP'], input['srcPort'], input['dstIP'], input['dstPort'])

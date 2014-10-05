@@ -97,10 +97,13 @@ class Rule:
 
 # Class for representing whole ACL with rules
 class ACL:
-    def __init__(self, lines):
+    def __init__(self, txt):
+        # storing txt input
+        self.txt = txt
+
         # Preparing text lines
         self.lines = []
-        for line in lines:
+        for line in self.txt.split('\n'):
             self.lines.append(' '.join(line.split()))
 
         self.rules = []
