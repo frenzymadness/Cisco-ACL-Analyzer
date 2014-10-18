@@ -25,11 +25,27 @@ portNumbers = {number: name for name, number in portNames.iteritems()}
 
 # function to switch mask from 0.0.255.255 to 255.255.0.0
 def switch_mask(mask):
+    """
+    >>> switch_mask('0.0.0.0')
+    '255.255.255.255'
+    >>> switch_mask('0.0.255.255')
+    '255.255.0.0'
+    >>> switch_mask('0.0.8.255')
+    '255.255.247.0'
+    >>> switch_mask('0.0.0.255')
+    '255.255.255.0'
+    """
     return '.'.join([str(255 - int(part)) for part in mask.split('.')])
 
 
 # function for generate human readable list of ports
 def ports_for_humans(ports):
+    """"
+    >>> ports_for_humans([22, 20, 'test', 8080])
+    'ssh, ftp-data, test, 8080'
+    >>> ports_for_humans([80, 443, 1000, 21])
+    'www, https, 1000, ftp'
+    """
     if len(ports) == 0:
         return 'all'
     else:
@@ -47,6 +63,38 @@ def ports_for_humans(ports):
 
 # Rule object class for one rule in ACL
 class Rule:
+    """
+    >>> r1 = Rule("permit tcp any host 10.10.10.10 eq 80 443")
+    >>> print r1
+    permit tcp any host 10.10.10.10 eq 80 443
+    >>> r1.type
+    'permit'
+    >>> r1.protocol
+    'tcp'
+    >>> r1.srcIP
+    IPv4Network('0.0.0.0/0')
+    >>> r1.dstIP
+    IPv4Address('10.10.10.10')
+    >>> r1.dstPort
+    [80, 443]
+    >>> r1.srcPort
+    []
+    >>> r2 = Rule("permit tcp host 10.1.1.1 eq 8000 8080 10.10.10.0 0.0.0.255 range 1000 1010")
+    >>> print r2
+    permit tcp host 10.1.1.1 eq 8000 8080 10.10.10.0 0.0.0.255 range 1000 1010
+    >>> r2.protocol
+    'tcp'
+    >>> r2.type
+    'permit'
+    >>> r2.srcIP
+    IPv4Address('10.1.1.1')
+    >>> r2.dstIP
+    IPv4Network('10.10.10.0/24')
+    >>> r2.dstPort
+    [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009]
+    >>> r2.srcPort
+    [8000, 8080]
+    """
     def __init__(self, line):
         # txt representation of rule
         self.txt = line
@@ -128,6 +176,30 @@ class Rule:
 
 # Class for representing whole ACL with rules
 class ACL:
+    """
+    >>> acl = ACL('''ip access-list extended NC-ven
+    ...  permit tcp 10.1.1.0 0.0.0.255 host 158.196.147.23 eq 28518
+    ...  permit ip 10.1.1.0 0.0.0.255 host 158.196.147.23
+    ...  permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888
+    ...  permit udp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888
+    ...  permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 8888
+    ...  permit icmp 10.1.1.0 0.0.0.255 host 158.196.141.88 echo
+    ...  permit tcp 10.1.1.0 0.0.0.255 host 193.62.193.80 eq www
+    ...  permit tcp 10.1.1.0 0.0.0.255 host 193.144.127.203 eq www
+    ...  deny   ip 10.1.1.0 0.0.0.255 any''')
+    >>> acl.txt
+    'ip access-list extended NC-ven\\n permit tcp 10.1.1.0 0.0.0.255 host 158.196.147.23 eq 28518\\n permit ip 10.1.1.0 0.0.0.255 host 158.196.147.23\\n permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888\\n permit udp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888\\n permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 8888\\n permit icmp 10.1.1.0 0.0.0.255 host 158.196.141.88 echo\\n permit tcp 10.1.1.0 0.0.0.255 host 193.62.193.80 eq www\\n permit tcp 10.1.1.0 0.0.0.255 host 193.144.127.203 eq www\\n deny   ip 10.1.1.0 0.0.0.255 any'
+    >>> acl.lines
+    ['ip access-list extended NC-ven', 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.147.23 eq 28518', 'permit ip 10.1.1.0 0.0.0.255 host 158.196.147.23', 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', 'permit udp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 8888', 'permit icmp 10.1.1.0 0.0.0.255 host 158.196.141.88 echo', 'permit tcp 10.1.1.0 0.0.0.255 host 193.62.193.80 eq www', 'permit tcp 10.1.1.0 0.0.0.255 host 193.144.127.203 eq www', 'deny ip 10.1.1.0 0.0.0.255 any']
+    >>> packet1 = Packet(protocol='udp', src_ip='10.10.10.10', src_port='', dst_ip='10.10.10.1', dst_port='80')
+    >>> acl.check_packet(packet1)
+    [[False, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.147.23 eq 28518', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch', 'destination port mismatch']], [False, 'permit ip 10.1.1.0 0.0.0.255 host 158.196.147.23', ['source IP mismatch', 'destination IP mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch', 'destination port mismatch']], [False, 'permit udp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', ['source IP mismatch', 'destination IP mismatch', 'destination port mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 8888', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch', 'destination port mismatch']], [False, 'permit icmp 10.1.1.0 0.0.0.255 host 158.196.141.88 echo', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 193.62.193.80 eq www', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 193.144.127.203 eq www', ['protocol mismatch', 'source IP mismatch', 'destination IP mismatch']], [False, 'deny ip 10.1.1.0 0.0.0.255 any', ['source IP mismatch']]]
+    >>> packet2 = Packet(protocol='tcp', src_ip='10.1.1.1', src_port='', dst_ip='158.196.147.23', dst_port='28518')
+    >>> acl.check_packet(packet2)
+    [[True, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.147.23 eq 28518', []], [True, 'permit ip 10.1.1.0 0.0.0.255 host 158.196.147.23', []], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', ['destination IP mismatch', 'destination port mismatch']], [False, 'permit udp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 18888', ['protocol mismatch', 'destination IP mismatch', 'destination port mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 158.196.141.88 eq 8888', ['destination IP mismatch', 'destination port mismatch']], [False, 'permit icmp 10.1.1.0 0.0.0.255 host 158.196.141.88 echo', ['protocol mismatch', 'destination IP mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 193.62.193.80 eq www', ['destination IP mismatch', 'destination port mismatch']], [False, 'permit tcp 10.1.1.0 0.0.0.255 host 193.144.127.203 eq www', ['destination IP mismatch', 'destination port mismatch']], [True, 'deny ip 10.1.1.0 0.0.0.255 any', []]]
+    >>> acl.generate_graph() # doctest: +ELLIPSIS
+    '....png'
+    """
     def __init__(self, txt):
         # storing txt input
         self.txt = txt
@@ -236,6 +308,19 @@ class ACL:
 
 # Class representing one packet
 class Packet:
+    """
+    >>> packet1 = Packet(protocol='udp', src_ip='10.10.10.10', src_port='3333', dst_ip='10.10.10.1', dst_port='80')
+    >>> print packet1
+    udp - 10.10.10.10:3333 --> 10.10.10.1:80
+    >>> packet1.srcPort
+    3333
+    >>> packet1.srcIP
+    IPv4Address('10.10.10.10')
+    >>> packet1.dstPort
+    80
+    >>> packet1.dstIP
+    IPv4Address('10.10.10.1')
+    """
     def __init__(self, protocol, src_ip, src_port, dst_ip, dst_port):
         self.protocol = protocol
         self.srcIP = ip_address(unicode(src_ip))
