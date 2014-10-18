@@ -69,12 +69,11 @@ class Rule:
             for port in parts:
                 if port.isdigit():
                     self.srcPort.append(int(port))
-                    parts.remove(port)
                 elif port in portNames:
                     self.srcPort.append(portNames[port])
-                    parts.remove(port)
                 else:
                     break
+            del parts[0:len(self.srcPort)]
         elif parts[0] == 'range':
             self.srcPort = range(int(parts[1]), int(parts[2]))
             del parts[0:3]
@@ -101,12 +100,11 @@ class Rule:
                 for port in parts:
                     if port.isdigit():
                         self.dstPort.append(int(port))
-                        parts.remove(port)
                     elif port in portNames:
                         self.dstPort.append(portNames[port])
-                        parts.remove(port)
                     else:
                         break
+                del parts[0:len(self.dstPort)]
             elif parts[0] == 'range':
                 self.dstPort = range(int(parts[1]), int(parts[2]))
                 del parts[0:3]
