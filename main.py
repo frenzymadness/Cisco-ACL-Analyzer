@@ -11,7 +11,7 @@ render = web.template.render(rootdir + 'templates/')
 urls = (
     '/', 'index',
     '/result', 'result'
-    )
+)
 
 
 # Main page
@@ -22,15 +22,15 @@ class index:
 
 class result:
     def POST(self):
-        input = web.input()
+        form = web.input()
         try:
-            acl = ACL(input['acl'])
+            acl = ACL(form['acl'])
         except Exception as e:
             return e
-        packet = Packet(input['protocol'], input['srcIP'], input['srcPort'], input['dstIP'], input['dstPort'])
-        result = acl.check_packet(packet)
+        packet = Packet(form['protocol'], form['srcIP'], form['srcPort'], form['dstIP'], form['dstPort'])
+        results = acl.check_packet(packet)
         print packet
-        return render.result(result, acl.generate_graph())
+        return render.result(results, acl.generate_graph())
 
 app = web.application(urls, globals(), autoreload=True)
 application = app.wsgifunc()
