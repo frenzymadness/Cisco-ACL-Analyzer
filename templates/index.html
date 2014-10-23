@@ -19,18 +19,24 @@
   <form class="form-inline" id="mainform" method="POST" action="/result">
     <div class="container">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <h2>Packet source</h2>
           <select class="form-control" name="protocol">
             <option value="tcp">TCP</option>
             <option value="udp">UDP</option>
             <option value="icmp">ICMP</option>
           </select>
-          <input type="text" name="srcIP" placeholder="IP" value="">:<input type="text" name="srcPort" placeholder="port or empty for random" value="">
+          <input type="text" id="srcIP" name="srcIP" placeholder="IP" value="">:<input type="text" id="srcPort" name="srcPort" placeholder="port or empty for random" value="">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-2">
+          <br/>
+          <br/>
+          <br/>
+          <button id="switch" type="button" class="btn btn-default">&lt;&lt;  switch  &gt;&gt;</button>
+        </div>
+        <div class="col-md-5">
           <h2>Packet destination</h2>
-          <input type="text" name="dstIP" placeholder="IP" value="">:<input type="text" name="dstPort" placeholder="port or empty for random" value="">
+          <input type="text" id="dstIP" name="dstIP" placeholder="IP" value="">:<input type="text" id="dstPort" name="dstPort" placeholder="port or empty for random" value="">
         </div>
       </div>
       <div class="row">
@@ -75,7 +81,19 @@
             }
           });
           return false;
-        });
+    });
+
+    //switch content of packet inputs
+    $$("#switch").click(function()
+    {
+      var srcIP = $$("#srcIP").val();
+      var srcPort = $$("#srcPort").val();  
+      
+      $$("#srcIP").val($$("#dstIP").val());
+      $$("#srcPort").val($$("#dstPort").val());
+      $$("#dstIP").val(srcIP);
+      $$("#dstPort").val(srcPort);
+    });
   });
 </script>
 </body>
